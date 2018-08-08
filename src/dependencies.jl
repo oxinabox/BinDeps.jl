@@ -113,6 +113,7 @@ function available_versions(p::AptGet)
             try
                 vs = l[(1+length("Version: ")):end]
                 push!(vers, vs)
+            catch
             end
         elseif lookfor_version && (m = match(DEBIAN_VERSION_REGEX, l)) !== nothing
             m.captures[2] !== nothing ? push!(vers, m.captures[2]) :
@@ -146,7 +147,6 @@ function available_version(y::Yum)
     found_uname = false
     found_version = false
     for l in eachline(`yum info $(y.package)`)
-        VERSION < v"0.6" && (l = chomp(l))
         if !found_uname
             # On 64-bit systems, we may have multiple arches installed
             # this makes sure we get the right one
@@ -208,7 +208,6 @@ function available_version(z::Zypper)
     ENV2 = copy(ENV)
     ENV2["LC_ALL"] = "C"
     for l in eachline(setenv(`zypper info $(z.package)`, ENV2))
-        VERSION < v"0.6" && (l = chomp(l))
         if !found_uname
             found_uname = endswith(l, uname)
             continue
@@ -388,7 +387,6 @@ elseif Compat.Sys.islinux()
     function read_sonames()
         empty!(sonames)
         for line in eachline(`/sbin/ldconfig -p`)
-            VERSION < v"0.6" && (line = chomp(line))
             m = match(r"^\s+([^ ]+)\.so[^ ]* \(([^)]*)\) => (.+)$", line)
             if m !== nothing
                 desc = m[2]
@@ -408,7 +406,6 @@ else
     function read_sonames()
         empty!(sonames)
         for line in eachline(`/sbin/ldconfig -r`)
-            VERSION < v"0.6" && (line = chomp(line))
             m = match(r"^\s+\d+:-l([^ ]+)\.[^. ]+ => (.+)$", line)
             if m !== nothing
                 sonames["lib" * m[1]] = m[2]
