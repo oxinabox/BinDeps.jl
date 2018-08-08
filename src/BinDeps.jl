@@ -173,7 +173,7 @@ mutable struct MakeTargets <: BuildStep
     targets::Vector{String}
     env::Dict
     MakeTargets(dir,target;env = Dict{AbstractString,AbstractString}()) = new(dir,target,env)
-    MakeTargets{S<:AbstractString}(target::Vector{S};env = Dict{AbstractString,AbstractString}()) = new("",target,env)
+    MakeTargets(target::Vector{S};env = Dict{AbstractString,AbstractString}()) where {S<:AbstractString} = new("",target,env)
     MakeTargets(target::String;env = Dict{AbstractString,AbstractString}()) = new("",[target],env)
     MakeTargets(;env = Dict{AbstractString,AbstractString}()) = new("",String[],env)
 end
